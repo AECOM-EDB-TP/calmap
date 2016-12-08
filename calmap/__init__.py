@@ -175,9 +175,12 @@ def yearplot(data, year=None, how='sum', vmin=None, vmax=None, cmap='Reds',
     # There may be some days assigned to previous year's last week or
     # next year's first week. We create new week numbers for them so
     # the ordering stays intact and week/day pairs unique.
-    by_day.loc[(by_day.index.month == 1) & (by_day.week > 50), 'week'] = 0
+    if by_day.loc[(by_day.index.month == 1), 'week'].max() > 50:
+        by_day.loc[(by_day.index.month == 1) & (by_day.week > 50), 'week'] = 0
+        by_day.week = by_day.week + 1
     by_day.loc[(by_day.index.month == 12) & (by_day.week < 10), 'week'] \
         = by_day.week.max() + 1
+
 
     # Pivot data on day and week and mask NaN days.
     plot_data = by_day.pivot('day', 'week', 'data').values[::-1]
