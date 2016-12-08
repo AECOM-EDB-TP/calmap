@@ -31,7 +31,7 @@ def yearplot(data, year=None, how='sum', vmin=None, vmax=None, cmap='Reds',
              fillcolor='whitesmoke', linewidth=1, linecolor=None,
              daylabels=calendar.day_abbr[:], dayticks=True,
              monthlabels=calendar.month_abbr[1:], monthticks=True, ax=None,
-             **kwargs):
+             colorbar=False, colorbar_kws=None, **kwargs):
     """
     Plot one year from a timeseries as a calendar heatmap.
 
@@ -117,6 +117,7 @@ def yearplot(data, year=None, how='sum', vmin=None, vmax=None, cmap='Reds',
                         dayticks=[0, 2, 4, 6])
 
     """
+    colorbar_kws = colorbar_kws or {'orientation': 'horizontal'}
     if year is None:
         year = data.index.sort_values()[0].year
 
@@ -181,7 +182,7 @@ def yearplot(data, year=None, how='sum', vmin=None, vmax=None, cmap='Reds',
     # Draw heatmap.
     kwargs['linewidth'] = linewidth
     kwargs['edgecolors'] = linecolor
-    ax.pcolormesh(plot_data, vmin=vmin, vmax=vmax, cmap=cmap, **kwargs)
+    mappable = ax.pcolormesh(plot_data, vmin=vmin, vmax=vmax, cmap=cmap, **kwargs)
 
     # Limit heatmap to our data.
     ax.set(xlim=(0, plot_data.shape[1]), ylim=(0, plot_data.shape[0]))
@@ -221,6 +222,9 @@ def yearplot(data, year=None, how='sum', vmin=None, vmax=None, cmap='Reds',
     ax.set_yticks([6 - i + 0.5 for i in dayticks])
     ax.set_yticklabels([daylabels[i] for i in dayticks], rotation='horizontal',
                        va='center')
+
+    if colorbar:
+        ax.get_figure().colorbar(mappable, **colorbar_kws)
 
     return ax
 
