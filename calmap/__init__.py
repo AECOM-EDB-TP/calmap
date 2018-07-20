@@ -155,7 +155,7 @@ def yearplot(data, year=None, how='sum', vmin=None, vmax=None, cmap='Reds',
         # of course won't work when the axes itself has a transparent
         # background so in that case we default to white which will usually be
         # the figure or canvas background color.
-        linecolor = ax.get_axis_bgcolor()
+        linecolor = ax.get_facecolor()
         if ColorConverter().to_rgba(linecolor)[-1] == 0:
             linecolor = 'white'
 
@@ -207,16 +207,15 @@ def yearplot(data, year=None, how='sum', vmin=None, vmax=None, cmap='Reds',
     if monthseparator:
         linekwargs = {'c': separatorcolor, 'lw': separatorwidth, 'ls': '-'}
         for key, fd in by_day.groupby('month').first().iterrows():
-            x = [fd.week - 1, fd.week - 1, fd.week, fd.week]
-            y = [0, 7 - fd.day, 7 - fd.day, 7]
-            ax.plot(x, y, **linekwargs)
-        last = by_day.iloc[-1]
-        # Draw line at the end of December
-        ax.plot([last.week - 1, last.week - 1, last.week, last.week],
-                [0, 6 - last.day, 6 - last.day, 7], **linekwargs)
-        # Draw upper and lower part of the box
-        ax.plot([1, by_day.week.max()], [7, 7], **linekwargs)
-        ax.plot([0, by_day.week.max() - 1], [0, 0], **linekwargs)
+            if key == 1:
+                continue
+            x = [fd.week - 1, fd.week - 1]
+            y = [0, 7 - fd.day]
+
+            # Make sure we don't get a "hat" on months that start on Monday
+            if fd.day != 0:
+                x.extend([fd.week, fd.week])
+                y.extend([7 - fd.day, 7])
 
     # Square cells.
     ax.set_aspect('equal')
