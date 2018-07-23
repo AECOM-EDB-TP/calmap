@@ -216,6 +216,8 @@ def yearplot(data, year=None, how='sum', vmin=None, vmax=None, cmap='Reds',
             if fd.day != 0:
                 x.extend([fd.week, fd.week])
                 y.extend([7 - fd.day, 7])
+            
+            ax.plot(x, y, **linekwargs)
 
     # Square cells.
     ax.set_aspect('equal')
